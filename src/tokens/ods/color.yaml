@@ -52,17 +52,17 @@ color:
     value: rgb(236, 235, 238)
   text:
     default:
-      value: rgb(4, 30, 66)
+      value: "{color.swatch.brand.default.value}"
     muted:
-      value: rgb(76, 95, 121)
+      value: "{color.swatch.passive.default.value}"
     inverse:
-      value: rgb(255, 255, 255)
+      value: "{color.background.default.value}"
   input:
     text:
       default:
-        value: rgb(4, 30, 66)
+        value: "{color.swatch.brand.default.value}"
       muted:
-        value: rgb(76, 95, 121)
+        value: "{color.swatch.passive.default.value}"
     border:
       value: rgb(206, 221, 238)
     bg:
