@@ -46,27 +46,33 @@ export const ariaHidden = {
   },
 }
 
+// TODO: Tippy gets initialized in every case,
+// which is not perfect when it comes to performance 
+// Update property instead of creating a new instance on componentUpdated
+const init = (el, { value }) => {
+  if (!value) {
+    return
+  }
+
+  destroy(el._tippy)
+
+  tippy(el, {
+    content: value,
+    interactive: true,
+    ignoreAttributes: true,
+    ...(Object.prototype.toString.call(value) === "[object Object]" && value),
+    aria: {
+      content: null,
+      expanded: false,
+    },
+    plugins: [hideOnEsc, ariaHidden],
+  })
+}
+
 export default {
   name: "OcTooltip",
-  bind: function (el, { value }) {
-    if (!value) {
-      return
-    }
-
-    destroy(el._tippy)
-
-    tippy(el, {
-      content: value,
-      interactive: true,
-      ignoreAttributes: true,
-      ...(Object.prototype.toString.call(value) === "[object Object]" && value),
-      aria: {
-        content: null,
-        expanded: false,
-      },
-      plugins: [hideOnEsc, ariaHidden],
-    })
-  },
+  bind: init,
+  componentUpdated: init,
   unbind: function (el) {
     destroy(el._tippy)
   },
