@@ -1,5 +1,20 @@
 ---
 color:
+#  sample:
+#    default:
+#      value: "{color.swatch.brand.default.value}"
+#      check:
+#        contrast:
+#          ratio: 3.5
+#          background:
+#            - "{color.background.default.value}"
+#            - "{color.background.muted.value}"
+#      transform:
+#        lighten: 10
+#        brighten: 10
+#        darken: 10
+#        desaturate: 10
+#        saturate: 10
   swatch:
     brand:
       default:

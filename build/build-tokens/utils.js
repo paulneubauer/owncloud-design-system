@@ -2,55 +2,67 @@ const tinyColor = require("tinycolor2")
 const path = require("path")
 const { color } = require("style-value-types")
 const { contrast, generateContrastColors } = require("@adobe/leonardo-contrast-colors")
+const getContrast = (color, on) =>
+  Math.round(
+    Math.abs(
+      contrast(
+        Object.values(tinyColor(color).toRgb()),
+        Object.values(tinyColor(on).toRgb()),
+        undefined
+      )
+    ) * 10
+  ) / 10
 
 exports.checkContrast = ({
-  color,
-  base = "rgb(255, 255, 255)",
-  ratio = 1,
+  givenColor,
+  givenBackgrounds = ["rgb(255, 255, 255)"],
+  ratio = 3.5,
   colorspace = "CAM02",
   output = "RGB",
 }) => {
-  const report = {
-    givenColor: tinyColor(color),
-    givenBase: tinyColor(base),
-    get givenRatio() {
-      return (
-        Math.round(
-          Math.abs(
-            contrast(
-              Object.values(this.givenColor.toRgb()),
-              Object.values(this.givenBase.toRgb()),
-              undefined
-            )
-          ) * 10
-        ) / 10
-      )
-    },
-  }
+  givenColor = tinyColor(givenColor)
+  givenBackgrounds = [
+    ...(Array.isArray(givenBackgrounds) ? givenBackgrounds : [givenBackgrounds]),
+  ].map(tinyColor)
+  console.log(
+    generateContrastColors({
+      colorKeys: givenBackgrounds,
+      base: color,
+      ratios: [ratio],
+      colorspace,
+      output,
+    })
+  )
+  const recommendedColor = tinyColor(
+    generateContrastColors({
+      colorKeys: givenBackgrounds,
+      base: color,
+      ratios: [ratio],
+      colorspace,
+      output,
+    })[0]
+  )
 
-  if (ratio > report.givenRatio) {
-    report.suggestedColor = tinyColor(
-      generateContrastColors({
-        colorKeys: [report.givenColor.toRgbString()],
-        base: report.givenBase.toRgbString(),
-        ratios: [ratio],
-        colorspace,
-        output,
-      })[0]
-    )
-    report.suggestedRatio =
-      Math.round(
-        Math.abs(
-          contrast(
-            Object.values(report.suggestedColor.toRgb()),
-            Object.values(report.givenBase.toRgb()),
-            undefined
-          )
-        ) * 10
-      ) / 10
-  }
+  return {
+    givenColor,
+    recommendedColor,
 
-  return report
+    backgrounds: givenBackgrounds.map(givenBackground => ({
+      givenBackground,
+      givenRatio: {
+        value: getContrast(givenColor.toRgbString(), givenBackground.toRgbString()),
+        get valid() {
+          return this.value >= ratio
+        },
+      },
+      recommendedRatio: {
+        value: getContrast(recommendedColor.toRgbString(), givenBackground.toRgbString()),
+        get valid() {
+          return this.value >= ratio
+        },
+      },
+    })),
+  }
 }
 
 exports.getPropType = prop => {
