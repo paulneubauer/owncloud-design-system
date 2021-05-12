@@ -13,48 +13,47 @@ module.exports = prop => {
     ratio: prop.check?.contrast?.ratio,
   })
 
-  if (report.backgrounds.every(background => background.givenRatio.valid)) {
+  if (report.results.every(result => result.givenRatio.valid)) {
     return
   }
 
   const printer = [chalk.red(util.format(`✗  %s`, chalk.bold(prop.name)))]
-  report.backgrounds.forEach((background, i) => {
-    const localPrinter = []
+  report.results.forEach((result, i) => {
     printer.push("   ----------------------------------------------------------------------------")
-    localPrinter.push(
-      util.format(
-        `   %s  %s has a contrast ratio of %s on %s`,
-        chalk.bold(background.givenRatio.valid ? "✓" : "✗"),
-        chalk.bold(
-          chalk.hex(report.givenColor.toHexString())(`■ ${report.givenColor.toRgbString()}`)
-        ),
-        chalk.bold(background.givenRatio.value),
-        chalk.bold(
-          chalk.hex(background.givenBackground.toHexString())(
-            `■ ${background.givenBackground.toRgbString()}`
-          )
-        )
+    printer.push(
+      chalk[result.givenRatio.valid ? "green" : "red"](
+        [
+          util.format(
+            `   %s  %s has a contrast ratio of %s on %s`,
+            chalk.bold(result.givenRatio.valid ? "✓" : "✗"),
+            chalk.bold(
+              chalk.hex(report.givenColor.toHexString())(`■ ${report.givenColor.toRgbString()}`)
+            ),
+            chalk.bold(result.givenRatio.value),
+            chalk.bold(
+              chalk.hex(result.givenBackground.toHexString())(
+                `■ ${result.givenBackground.toRgbString()}`
+              )
+            )
+          ),
+          util.format(
+            `      %s with a ratio of %s fixes this`,
+            chalk.bold(
+              chalk.hex(result.recommendedColor.toHexString())(
+                `■ ${result.recommendedColor.toRgbString()}`
+              )
+            ),
+            chalk.bold(result.recommendedRatio.value),
+            chalk.bold(
+              chalk.hex(result.givenBackground.toHexString())(
+                `■ ${result.givenBackground.toRgbString()}`
+              )
+            )
+          ),
+        ].join("\n")
       )
     )
-    localPrinter.push(
-      util.format(
-        `      %s with a ratio of %s fixes this`,
-        chalk.bold(
-          chalk.hex(report.recommendedColor.toHexString())(
-            `■ ${report.recommendedColor.toRgbString()}`
-          )
-        ),
-        chalk.bold(background.recommendedRatio.value),
-        chalk.bold(
-          chalk.hex(background.givenBackground.toHexString())(
-            `■ ${background.givenBackground.toRgbString()}`
-          )
-        )
-      )
-    )
-
-    printer.push(chalk[background.givenRatio.valid ? "green" : "red"](localPrinter.join("\n")))
-    if (i + 1 === report.backgrounds.length) {
+    if (i + 1 === report.results.length) {
       printer.push("\n")
     }
   })

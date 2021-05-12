@@ -21,13 +21,57 @@ exports.checkContrast = ({
   output = "RGB",
 }) => {
   givenColor = tinyColor(givenColor)
+  return {
+    givenColor,
+    results: [...(Array.isArray(givenBackgrounds) ? givenBackgrounds : [givenBackgrounds])].map(
+      givenBackground => {
+        givenBackground = tinyColor(givenBackground)
+        const recommendedColor = tinyColor(
+          generateContrastColors({
+            colorKeys: [givenColor.toRgbString()],
+            base: givenBackground.toRgbString(),
+            ratios: [ratio],
+            colorspace,
+            output,
+          })[0]
+        )
+
+        return {
+          givenBackground,
+          givenRatio: {
+            value: getContrast(givenColor.toRgbString(), givenBackground.toRgbString()),
+            get valid() {
+              return this.value >= ratio
+            },
+          },
+          recommendedColor,
+          recommendedRatio: {
+            value: getContrast(recommendedColor.toRgbString(), givenBackground.toRgbString()),
+            get valid() {
+              return this.value >= ratio
+            },
+          },
+        }
+      }
+    ),
+  }
+}
+
+exports.checkContrasts = ({
+  givenColor,
+  givenBackgrounds = ["rgb(255, 255, 255)"],
+  ratio = 3.5,
+  colorspace = "CAM02",
+  output = "RGB",
+}) => {
+  givenColor = tinyColor(givenColor)
   givenBackgrounds = [
     ...(Array.isArray(givenBackgrounds) ? givenBackgrounds : [givenBackgrounds]),
   ].map(tinyColor)
   const recommendedColor = tinyColor(
     generateContrastColors({
-      colorKeys: givenBackgrounds,
-      base: color,
+      colorKeys: givenBackgrounds.map(givenBackground => givenBackground.toRgbString()),
+      base: givenColor.toRgbString(),
       ratios: [ratio],
       colorspace,
       output,
