@@ -24,15 +24,6 @@ exports.checkContrast = ({
   givenBackgrounds = [
     ...(Array.isArray(givenBackgrounds) ? givenBackgrounds : [givenBackgrounds]),
   ].map(tinyColor)
-  console.log(
-    generateContrastColors({
-      colorKeys: givenBackgrounds,
-      base: color,
-      ratios: [ratio],
-      colorspace,
-      output,
-    })
-  )
   const recommendedColor = tinyColor(
     generateContrastColors({
       colorKeys: givenBackgrounds,
