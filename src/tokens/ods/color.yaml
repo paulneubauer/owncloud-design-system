@@ -23,7 +23,10 @@ color:
         value: rgb(34, 57, 89)
     primary:
       default:
-        value: rgb(78, 133, 200)
+        value: rgb(75, 121, 176)
+        check:
+          contrast: 
+            ratio: 4.51
       hover:
         value: rgb(128, 167, 215)
       muted:
